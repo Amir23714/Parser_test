@@ -1,11 +1,16 @@
 import asyncio
 import re
+import time
+
 from tqdm import tqdm
 import aiohttp
 import lxml
 import csv
 from bs4 import BeautifulSoup as bs
 import logging
+
+import aiofiles
+
 
 
 class Parser:
@@ -31,22 +36,22 @@ class Parser:
         # Field names for header columns of .csv file
         self.field_names = ["url", "title", "description", "emails", "phones", "postal_codes", "inns", "ogrns"]
 
-    def init_csv(self):
+    async def init_csv(self):
         """Initializes result.csv file"""
-        with open(self.csv_path, 'w', newline="") as csvfile:
+        async with aiofiles.open(self.csv_path, 'w', newline="") as csvfile:
             writer = csv.writer(csvfile, delimiter=";")
 
-            writer.writerow(
+            await writer.writerow(
                 self.field_names
             )
 
-    def fill_csv(self, url: str, title: str, description: str, emails: str, phones: str, postal_codes: str, inns: str,
+    async def fill_csv(self, url: str, title: str, description: str, emails: str, phones: str, postal_codes: str, inns: str,
                  ogrns: str):
         """Appends data to result.csv file"""
-        with open(self.csv_path, 'a', newline="") as csvfile:
+        async with aiofiles.open(self.csv_path, 'a', newline="") as csvfile:
             writer = csv.writer(csvfile, delimiter=";")
 
-            writer.writerow(
+            await writer.writerow(
                 (url, title, description, emails, phones, postal_codes, inns, ogrns)
             )
 
@@ -143,7 +148,7 @@ class Parser:
             if ogrns == '':
                 ogrns = "н/д"
 
-            self.fill_csv(url, title, description, emails, phones, postal_codes, inns, ogrns)
+            await  self.fill_csv(url, title, description, emails, phones, postal_codes, inns, ogrns)
 
         elif depth == 0:
             soup = bs(await response.text(), 'lxml')
@@ -234,7 +239,7 @@ class Parser:
             if ogrns == '':
                 ogrns = "н/д"
 
-            self.fill_csv(url, title, description, emails, phones, postal_codes, inns, ogrns)
+            await self.fill_csv(url, title, description, emails, phones, postal_codes, inns, ogrns)
 
             # Doing in-depth searching
             search_texts = ["Контакты", "Contacts"]
@@ -262,7 +267,9 @@ class Parser:
             for link in hrefs:
                 if link not in already_visited:
                     try:
+                        # start = time.time()
                         response = await session.get(f"https://{link}", verify_ssl=False)
+                        # print(f"response for {link} took {time.time() - start} seconds")
                         if response.status == 200 or response.status == 201:
                             task = asyncio.create_task(self.parse_page(link, response, 1, session))
                             tasks.append(task)
@@ -286,7 +293,7 @@ class Parser:
                             format='%(asctime)s - %(levelname)s - %(message)s')
 
         # Initialize the CSV file for storing results
-        self.init_csv()
+        await self.init_csv()
 
         tasks = []
 
@@ -296,9 +303,9 @@ class Parser:
                 # If url is broken, access is forbidden or anything else happens, code skips this url and writes it to
                 # the error_logs
                 try:
-
+                    # start = time.time()
                     response = await session.get(f"https://{url}", verify_ssl=False)
-
+                    # print(f"response for {url} took {time.time()-start} seconds")
                     # Check if the response status indicates success (200 or 201)
                     if response.status == 200 or response.status == 201:
                         task = asyncio.create_task(self.parse_page(url, response, 0, session))
