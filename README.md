@@ -17,7 +17,7 @@ Before you start using this project, make sure you have Python installed on your
 1. Сlone the repository to the target folder where the project should be located
 
 ```bash
-git clone https://github.com/your-username/Parser_test.git
+git clone https://github.com/Amir23714/Parser_test.git
 ```
 
 2. Install requirements
