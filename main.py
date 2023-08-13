@@ -1,16 +1,15 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from TXT_parsing.txt_to_list import parse_txt
+from TXT_parsing.validate_url import validate_url
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def main():
+    urls = parse_txt("Static_files\\domains.txt")
+    blocked = parse_txt("Static_files\\block_domains.txt")
+
+    urls = validate_url(urls, blocked)
+
+    return urls
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# if __name__ == "__main__":
+#     main()
