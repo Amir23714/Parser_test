@@ -1,8 +1,10 @@
+import asyncio
 import time
 
 from TXT_parsing.txt_to_list import parse_txt
 from TXT_parsing.validate_url import validate_url
 from web_parse import Parser
+
 
 def main():
     start = time.time()
@@ -13,9 +15,9 @@ def main():
 
     parser = Parser(urls)
 
-    parser.parse()
+    asyncio.run(parser.parse())
 
-    print(time.time() - start)
+    print("Parsing successfully finished and took ", (time.time() - start), " seconds")
 
 
 if __name__ == "__main__":
