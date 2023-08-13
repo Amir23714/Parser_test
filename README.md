@@ -28,6 +28,7 @@ pip install -r requirements.txt
 
 3. If necessary, make changes to domains.txt and block_domains.txt
 4. **Create a directory named "Results":** Before running the project, make sure you have a directory named "Results" located in the same directory as the `main.py` file. If it doesn't exist, create it manually.
+
 ```bash
 mkdir Results
 ```
